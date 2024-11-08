@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "gym-rdm"
+version = "0.1.0"
+description = "A Gymnasium environment for training agents on Random Dot Motion tasks"
+authors = ["Baptiste Pesquet <bpesquet@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+gymnasium = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.3.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
