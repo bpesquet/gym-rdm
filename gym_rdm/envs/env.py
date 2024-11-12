@@ -9,6 +9,7 @@ import numpy as np
 import gymnasium as gym
 import pygame
 from gym_rdm.envs import params
+from gym_rdm.envs.display import RandomDotMotionDisplay
 
 # pylint: disable=invalid-name
 ObsType = TypeVar("ObsType")
@@ -44,21 +45,19 @@ class RandomDotMotionEnv(gym.Env, ABC):
         """
         Initialize the environment
         """
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
-        self.render_mode = render_mode
         self.n_dpts = n_dots
         self.coherence = coherence
-        self.window_size = params.WINDOW_SIZE
+        self.canvas_size = params.CANVAS_SIZE
 
         self.action_space = gym.spaces.Discrete(len(Action))
 
-        """
-        If human-rendering is used, `self.window` will be a reference to the window that we draw to. 
-        `self.clock` will be a clock that is used to ensure that the environment is rendered at the correct framerate in human-mode.
-        They will remain `None` until human-mode is used for the first time.
-        """
-        self.window = None
-        self.clock = None
+        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        self.render_mode = render_mode
+        if self.render_mode == "human":
+            # Init display used in human rendering mode only
+            self.display = RandomDotMotionDisplay(
+                render_fps=self.metadata["render_fps"], window_size=self.canvas_size
+            )
 
     def reset(
         self, *, seed: Optional[int] = None, options: Optional[dict[str, Any]] = None
@@ -82,34 +81,21 @@ class RandomDotMotionEnv(gym.Env, ABC):
 
     def _render_frame(self):
         """
-        Render the current state of the environment as a frame
+        Render the current state as a frame
         """
-        if self.window is None and self.render_mode == "human":
-            pygame.init()
-            pygame.display.init()
-            self.window = pygame.display.set_mode((self.window_size, self.window_size))
-
-        if self.clock is None and self.render_mode == "human":
-            self.clock = pygame.time.Clock()
-
-        canvas = pygame.Surface((self.window_size, self.window_size))
+        canvas = pygame.Surface((self.canvas_size, self.canvas_size))
         canvas.fill(params.BACKGROUND_COLOR)
 
         if self.render_mode == "human":
-            # The following line copies our drawings from the canvas to the visible window
-            self.window.blit(canvas, canvas.get_rect())
-            pygame.event.pump()
-            pygame.display.update()
-
-            # We need to ensure that human-rendering occurs at the predefined framerate.
-            # The following line will automatically add a delay to keep the framerate stable.
-            self.clock.tick(self.metadata["render_fps"])
-        else:  # rgb_array
+            self.display.update(canvas)
+        elif self.render_mode == "rgb_array":
+            # Return current state as a RGB pixel grid
             return np.transpose(
                 np.array(pygame.surfarray.pixels3d(canvas)), axes=(1, 0, 2)
             )
+        print("Warning: unrecognized render mode during frame rendering")
+        return None
 
     def close(self):
-        if self.window is not None:
-            pygame.display.quit()
-            pygame.quit()
+        if self.display is not None:
+            self.display.close()
