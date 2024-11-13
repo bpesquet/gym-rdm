@@ -1,5 +1,5 @@
 """
-Pygame-powered display for a RDM task
+Display window for a RDM task.
 """
 
 import pygame
@@ -16,11 +16,10 @@ class RandomDotMotionDisplay:
         self.window_size = window_size
 
         pygame.init()
-        pygame.display.init()
         pygame.display.set_caption(params.WINDOW_TITLE)
 
-        # Reference to the window we draw to
-        self.window = pygame.display.set_mode((self.window_size, self.window_size))
+        # Reference to the screen we draw to
+        self.screen = pygame.display.set_mode((self.window_size, self.window_size))
 
         # Clock used to ensure that the environment is rendered at the correct framerate
         self.clock = pygame.time.Clock()
@@ -28,17 +27,19 @@ class RandomDotMotionDisplay:
     def update(self, canvas):
         """Update display window to show the current state to the user"""
 
-        # The following line copies our drawings from the canvas to the visible window
-        self.window.blit(canvas, canvas.get_rect())
-        pygame.event.pump()
-        pygame.display.update()
+        # Copy the updated canvas to the screen
+        self.screen.blit(source=canvas, dest=canvas.get_rect())
 
-        # We need to ensure that human-rendering occurs at the predefined framerate.
-        # The following line will automatically add a delay to keep the framerate stable.
+        # Process pygame internal events
+        pygame.event.pump()
+
+        # Update the screen
+        pygame.display.flip()
+
+        # Limit framerate to desired value
         self.clock.tick(self.render_fps)
 
     def close(self):
         """Close display window"""
 
-        pygame.display.quit()
         pygame.quit()

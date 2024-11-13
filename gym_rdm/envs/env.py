@@ -36,17 +36,12 @@ class RandomDotMotionEnv(gym.Env, ABC):
     # Supported render modes and framerate
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 25}
 
-    def __init__(
-        self,
-        render_mode: Optional[str] = None,
-        n_dots: Optional[int] = params.N_DOTS,
-        coherence: Optional[float] = params.COHERENCE,
-    ):
+    def __init__(self, render_mode: Optional[str] = None):
         """
         Initialize the environment
         """
-        self.n_dpts = n_dots
-        self.coherence = coherence
+        self.n_dpts = params.N_DOTS
+        self.coherence = params.COHERENCE
         self.canvas_size = params.CANVAS_SIZE
 
         self.action_space = gym.spaces.Discrete(len(Action))
