@@ -9,10 +9,10 @@ clock = pygame.time.Clock()
 
 center = (params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2)
 dot = Dot(
-    radius=150,
+    radius=190,
     center=center,
-    aperture_radius=params.CANVAS_SIZE / 2 - params.DOT_SIZE,
-    motion_angle=180,
+    aperture_radius=200,
+    motion_angle=90,
 )
 dots = pygame.sprite.Group()
 dots.add(dot)
@@ -26,7 +26,7 @@ while running:
             running = False
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill(params.BACKGROUND_COLOR)
+    # screen.fill(params.BACKGROUND_COLOR)
 
     # Move all dots
     dots.update()

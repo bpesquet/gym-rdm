@@ -48,11 +48,11 @@ class Dot(pygame.sprite.Sprite):
         super().__init__()
 
         self.center = center
-        self.max_radius = aperture_radius - params.DOT_SIZE / 2
+        self.max_radius = aperture_radius  # - params.DOT_SIZE
 
         # Motion angle may be set randomly depending on coherence
         self.motion_angle = (
-            motion_angle if random.random() < coherence else random.randint(0, 360)
+            motion_angle if random.random() < coherence else random.randint(0, 359)
         )
 
         # Create an image of the dot, and fill it with its color
@@ -63,7 +63,7 @@ class Dot(pygame.sprite.Sprite):
         self.speed = Coords.from_polar(radius=speed, angle=self.motion_angle)
 
         # Initial dot angle is set randomly
-        angle = random.randint(0, 360)
+        angle = 10  # random.randint(0, 359)
 
         # Initial dot position in local coordinates (relative to the center of the dot circular area)
         position = Coords.from_polar(radius=radius, angle=angle)
@@ -77,13 +77,13 @@ class Dot(pygame.sprite.Sprite):
         """(Overriden) Move the dot around"""
 
         # Move dot according to speed vector
-        self.rect.move_ip(self.speed.x, self.speed.y)
+        self.rect.move_ip(self.speed.x, -self.speed.y)
 
         # Check if dot is now outside of circular area, and reset its position in that case
         (new_x, new_y) = self.rect.center
         (x_center, y_center) = self.center
         distance_to_center = sqrt((new_x - x_center) ** 2 + (new_y - y_center) ** 2)
-        if distance_to_center > self.max_radius:
+        if distance_to_center >= self.max_radius:
             self._reset()
 
     def _reset(self):
