@@ -6,7 +6,7 @@ Default values for Random Dot Movement parameters.
 N_DOTS = 500
 
 # Motion coherence: percentage of dots moving in the same direction
-COHERENCE = 1.0
+COHERENCE = 0.5
 
 # Siez of the pygame canvas
 CANVAS_SIZE = 512
@@ -18,7 +18,7 @@ WINDOW_TITLE = "Random Dot Motion environment"
 DOT_SIZE = 3
 
 # Dot speed in pixels per frame
-DOT_SPEED = 1
+DOT_SPEED = 3
 
 # Dot color
 DOT_COLOR = (255, 255, 255)

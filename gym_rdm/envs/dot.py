@@ -48,7 +48,7 @@ class Dot(pygame.sprite.Sprite):
         super().__init__()
 
         self.center = center
-        self.max_radius = aperture_radius  # - params.DOT_SIZE
+        self.max_radius = aperture_radius - params.DOT_SIZE / 2
 
         # Motion angle may be set randomly depending on coherence
         self.motion_angle = (
@@ -63,7 +63,7 @@ class Dot(pygame.sprite.Sprite):
         self.speed = Coords.from_polar(radius=speed, angle=self.motion_angle)
 
         # Initial dot angle is set randomly
-        angle = 10  # random.randint(0, 359)
+        angle = random.randint(0, 359)
 
         # Initial dot position in local coordinates (relative to the center of the dot circular area)
         position = Coords.from_polar(radius=radius, angle=angle)
@@ -89,7 +89,7 @@ class Dot(pygame.sprite.Sprite):
     def _reset(self):
         """Reset dot position"""
 
-        # Move dot to the opposite border of the circular area
+        # Move dot to the other side of the circular area
         # (angle is randomly altered for more stochasticity)
         new_radius = self.max_radius
         new_angle = self.motion_angle - 180 + random.randint(-90, 90)
@@ -98,9 +98,8 @@ class Dot(pygame.sprite.Sprite):
         new_position = Coords.from_polar(radius=new_radius, angle=new_angle)
 
         # Update position of the dot
-        self.rect.update(
-            self._get_abs_position(position=new_position),
-            (params.DOT_SIZE, params.DOT_SIZE),
+        self.rect = self.image.get_rect(
+            center=self._get_abs_position(position=new_position)
         )
 
     def _get_abs_position(self, position: Coords):
