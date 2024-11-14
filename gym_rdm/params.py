@@ -2,18 +2,27 @@
 Default values for Random Dot Movement parameters.
 """
 
+# ----- Simulation -----
 # Number of dots
 N_DOTS = 500
 
 # Motion coherence: percentage of dots moving in the same direction
 COHERENCE = 0.5
 
-# Siez of the pygame canvas
-CANVAS_SIZE = 512
+# Dfault motion angle (in degrees)
+MOTION_ANGLE = 180
+
+# ------ Display -----
+# Siez of the pygame display
+DISPLAY_SIZE = 512
 
 # Title of the display window
-WINDOW_TITLE = "Random Dot Motion environment"
+WINDOW_TITLE = "Random Dot Motion"
 
+# Radius of the circular area containing the dots
+APERTURE_RADIUS = 216
+
+# ------ Dots -----
 # Dot size in pixels
 DOT_SIZE = 3
 

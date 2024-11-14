@@ -8,8 +8,8 @@ from typing import Optional, Any, TypeVar, SupportsFloat
 import numpy as np
 import gymnasium as gym
 import pygame
-from gym_rdm.envs import params
-from gym_rdm.envs.display import RandomDotMotionDisplay
+from gym_rdm import params
+from gym_rdm.task.display import RandomDotMotionDisplay
 
 # pylint: disable=invalid-name
 ObsType = TypeVar("ObsType")
@@ -34,7 +34,7 @@ class RandomDotMotionEnv(gym.Env, ABC):
     """Gym environment implementing a RDM task"""
 
     # Supported render modes and framerate
-    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 25}
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 30}
 
     def __init__(self, render_mode: Optional[str] = None):
         """
@@ -42,7 +42,7 @@ class RandomDotMotionEnv(gym.Env, ABC):
         """
         self.n_dpts = params.N_DOTS
         self.coherence = params.COHERENCE
-        self.canvas_size = params.CANVAS_SIZE
+        self.canvas_size = params.DISPLAY_SIZE
 
         self.action_space = gym.spaces.Discrete(len(Action))
 

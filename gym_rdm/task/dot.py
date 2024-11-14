@@ -4,33 +4,9 @@ Moving dot.
 
 from typing import Tuple
 import random
-from math import cos, sin, radians, sqrt, atan2, degrees
 import pygame
-from gym_rdm.envs import params
-
-
-class Coords:
-    """Cartesian coordinates of an object"""
-
-    def __init__(self, x: float, y: float):
-        self.x = x
-        self.y = y
-
-    @classmethod
-    def from_polar(cls, radius: float, angle: float):
-        """Init from polar coordinates, with angle expressed in degrees"""
-
-        angle_radians = radians(angle)
-        x = radius * cos(angle_radians)
-        y = radius * sin(angle_radians)
-        return cls(x, y)
-
-    def to_polar(self):
-        """Convert to polar coordinates, with angle expressed in degrees"""
-
-        radius = sqrt(self.x**2 + self.y**2)
-        angle = degrees(atan2(self.y, self.x))
-        return (radius, angle)
+from pygame.math import Vector2
+from gym_rdm import params
 
 
 class Dot(pygame.sprite.Sprite):
@@ -60,13 +36,13 @@ class Dot(pygame.sprite.Sprite):
         self.image.fill(color=params.DOT_COLOR)
 
         # Speed vector
-        self.speed = Coords.from_polar(radius=speed, angle=self.motion_angle)
+        self.speed: Vector2 = Vector2.from_polar((speed, self.motion_angle))
 
         # Initial dot angle is set randomly
         angle = random.randint(0, 359)
 
         # Initial dot position in local coordinates (relative to the center of the dot circular area)
-        position = Coords.from_polar(radius=radius, angle=angle)
+        position = Vector2.from_polar((radius, angle))
 
         # Fetch the rectangle object that has the dimensions of the dot, centered at its absolute coordinates
         self.rect = self.image.get_rect(
@@ -80,10 +56,9 @@ class Dot(pygame.sprite.Sprite):
         self.rect.move_ip(self.speed.x, -self.speed.y)
 
         # Check if dot is now outside of circular area, and reset its position in that case
-        (new_x, new_y) = self.rect.center
-        (x_center, y_center) = self.center
-        distance_to_center = sqrt((new_x - x_center) ** 2 + (new_y - y_center) ** 2)
-        if distance_to_center >= self.max_radius:
+        new_position = Vector2(self.rect.center)
+        distance_to_center = new_position.distance_to(Vector2(self.center))
+        if distance_to_center > self.max_radius:
             self._reset()
 
     def _reset(self):
@@ -95,14 +70,14 @@ class Dot(pygame.sprite.Sprite):
         new_angle = self.motion_angle - 180 + random.randint(-90, 90)
 
         # Compute local coordinates
-        new_position = Coords.from_polar(radius=new_radius, angle=new_angle)
+        new_position = Vector2.from_polar((new_radius, new_angle))
 
         # Update position of the dot
         self.rect = self.image.get_rect(
             center=self._get_abs_position(position=new_position)
         )
 
-    def _get_abs_position(self, position: Coords):
+    def _get_abs_position(self, position: Vector2):
         """Convert local coordinates to absolute"""
 
         # Pygame origin is the top left of the screen
