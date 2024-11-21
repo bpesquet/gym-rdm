@@ -1,5 +1,5 @@
 """
-Random Dot Motion Gymnasium environment.
+Random Dot Motion environment for Gymnasium.
 """
 
 from abc import ABC
@@ -9,7 +9,7 @@ import numpy as np
 import gymnasium as gym
 import pygame
 from gym_rdm import params
-from gym_rdm.task.display import RandomDotMotionDisplay
+from gym_rdm.task import Task
 
 # pylint: disable=invalid-name
 ObsType = TypeVar("ObsType")
@@ -40,19 +40,20 @@ class RandomDotMotionEnv(gym.Env, ABC):
         """
         Initialize the environment
         """
-        self.n_dpts = params.N_DOTS
-        self.coherence = params.COHERENCE
-        self.canvas_size = params.DISPLAY_SIZE
+        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        self.render_mode = render_mode
+
+        # Init the RDM task
+        self.task = Task(
+            show_window=self.render_mode == "human", fps=self.metadata["render_fps"]
+        )
 
         self.action_space = gym.spaces.Discrete(len(Action))
 
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
-        self.render_mode = render_mode
-        if self.render_mode == "human":
-            # Init display used in human rendering mode only
-            self.display = RandomDotMotionDisplay(
-                render_fps=self.metadata["render_fps"], window_size=self.canvas_size
-            )
+        # Observations are the pixels of the dot area
+        self.observation_space = gym.spaces.Box(
+            low=0, high=255, shape=self.task.get_dot_box(), dtype=np.uint8
+        )
 
     def reset(
         self, *, seed: Optional[int] = None, options: Optional[dict[str, Any]] = None
@@ -78,19 +79,14 @@ class RandomDotMotionEnv(gym.Env, ABC):
         """
         Render the current state as a frame
         """
-        canvas = pygame.Surface((self.canvas_size, self.canvas_size))
-        canvas.fill(params.BACKGROUND_COLOR)
+        self.task.run_frame()
 
-        if self.render_mode == "human":
-            self.display.update(canvas)
-        elif self.render_mode == "rgb_array":
+        if self.render_mode == "rgb_array":
             # Return current state as a RGB pixel grid
             return np.transpose(
                 np.array(pygame.surfarray.pixels3d(canvas)), axes=(1, 0, 2)
             )
-        print("Warning: unrecognized render mode during frame rendering")
         return None
 
     def close(self):
-        if self.display is not None:
-            self.display.close()
+        self.task.quit()

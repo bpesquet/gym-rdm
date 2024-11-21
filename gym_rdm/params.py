@@ -20,7 +20,7 @@ DISPLAY_SIZE = 512
 WINDOW_TITLE = "Random Dot Motion"
 
 # Radius of the circular area containing the dots
-APERTURE_RADIUS = 216
+APERTURE_RADIUS = 256
 
 # ------ Dots -----
 # Dot size in pixels

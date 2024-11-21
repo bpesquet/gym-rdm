@@ -3,12 +3,17 @@ Unit tests for Random Dot Motion environment.
 """
 
 import gymnasium as gym
-import gym_rdm  # Necessary to register the environment
+from gym_rdm.envs import RandomDotMotionEnv
 
 
 def test_rdm_env():
     """Test the RDM environment"""
 
-    _ = gym.make("RDM-v0")
+    env = RandomDotMotionEnv()
+    obs, info = env.reset()
 
-    assert True
+
+def test_rdm_env_make():
+    """Test registering the RDM environment through Gymnasium"""
+
+    _ = gym.make("RDM-v0")

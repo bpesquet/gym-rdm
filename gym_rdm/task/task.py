@@ -1,17 +1,18 @@
 """
-Random Dot Motion task
+Random Dot Motion task.
 """
 
+from typing import Tuple
 import numpy as np
 import pygame
 from gym_rdm import params
-from gym_rdm.task.dot import Dot
+from .dot import Dot
 
 
 class Task:
     """Random Dot Motion task"""
 
-    def __init__(self, show_window=True, fps=30):
+    def __init__(self, show_window: bool = True, fps: int = 30):
         self.show_window = show_window
         self.fps = fps
 
@@ -59,11 +60,15 @@ class Task:
                 )
             )
 
-    def run(self):
-        """Run the task"""
+    def run(self, n_frames: int = None):
+        """Run the task for a specified number of frames or indefinitely"""
 
-        running = True
+        frame = 0
+        running = n_frames is None or frame < n_frames
         while running:
+            frame += 1
+            running = n_frames is None or frame < n_frames
+
             # poll for events
             # pygame.QUIT event means the user clicked X to close your window
             for event in pygame.event.get():
@@ -105,3 +110,17 @@ class Task:
 
         # Pygame cleanup
         pygame.quit()
+
+    def get_dot_box(self) -> Tuple[int, int]:
+        """Return the dimensions of the squared box containing the dots"""
+
+        box_size: int = params.APERTURE_RADIUS * 2
+        return (box_size, box_size)
+
+    def get_pixels_array(self) -> np.ndarray:
+        """Return current task state as an array of pixels"""
+
+        # return pygame.surfarray.pixels2d(self.canvas)
+        return np.transpose(
+            np.array(pygame.surfarray.pixels3d(self.canvas)), axes=(1, 0, 2)
+        )
