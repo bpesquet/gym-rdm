@@ -2,7 +2,6 @@
 Random Dot Motion task.
 """
 
-from typing import Tuple
 import numpy as np
 import pygame
 from gym_rdm import params
@@ -76,17 +75,21 @@ class Task:
                     running = False
 
             self.run_frame()
+            self.render_frame()
 
         self.quit()
 
     def run_frame(self):
-        """Run one frame of the task"""
-
-        # fill the canvas with a color to wipe away anything from last frame
-        self.canvas.fill(params.BACKGROUND_COLOR)
+        """Run the task for one frame"""
 
         # Move all dots
         self.dots.update()
+
+    def render_frame(self):
+        """Render the current frame to the screen"""
+
+        # fill the canvas with a color to wipe away anything from last frame
+        self.canvas.fill(params.BACKGROUND_COLOR)
 
         # Draw dots to the screen
         self.dots.draw(self.canvas)
@@ -105,22 +108,15 @@ class Task:
             # The following line will automatically add a delay to keep the framerate stable.
             self.clock.tick(self.fps)
 
+    def get_frame(self) -> np.ndarray:
+        """Return the current frame as an array of pixels"""
+
+        return np.transpose(
+            np.array(pygame.surfarray.pixels3d(self.canvas)), axes=(1, 0, 2)
+        )
+
     def quit(self):
         """Quit the task"""
 
         # Pygame cleanup
         pygame.quit()
-
-    def get_dot_box(self) -> Tuple[int, int]:
-        """Return the dimensions of the squared box containing the dots"""
-
-        box_size: int = params.APERTURE_RADIUS * 2
-        return (box_size, box_size)
-
-    def get_pixels_array(self) -> np.ndarray:
-        """Return current task state as an array of pixels"""
-
-        # return pygame.surfarray.pixels2d(self.canvas)
-        return np.transpose(
-            np.array(pygame.surfarray.pixels3d(self.canvas)), axes=(1, 0, 2)
-        )

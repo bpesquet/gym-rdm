@@ -7,8 +7,6 @@ from enum import Enum
 from typing import Optional, Any, TypeVar, SupportsFloat
 import numpy as np
 import gymnasium as gym
-import pygame
-from gym_rdm import params
 from gym_rdm.task import Task
 
 # pylint: disable=invalid-name
@@ -52,7 +50,7 @@ class RandomDotMotionEnv(gym.Env, ABC):
 
         # Observations are the pixels of the dot area
         self.observation_space = gym.spaces.Box(
-            low=0, high=255, shape=self.task.get_dot_box(), dtype=np.uint8
+            low=0, high=255, shape=self.task.get_frame().shape, dtype=np.uint8
         )
 
     def reset(
@@ -61,32 +59,40 @@ class RandomDotMotionEnv(gym.Env, ABC):
         # initialize the random number generator
         super().reset(seed=seed)
 
+        observation = self._get_obs()
+
         if self.render_mode == "human":
-            self._render_frame()
+            self.task.render_frame()
+
+        return observation, None
 
     def step(
-        self, action: ActType
+        self, action: Action
     ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
+
+        self.task.run_frame()
+
+        terminated = action != Action.WAIT
+        reward = 0  # No learning for now
+        observation = self._get_obs()
+
         if self.render_mode == "human":
-            self._render_frame()
+            self.task.render_frame()
+
+        return observation, reward, terminated, False, None
 
     def render(self):
         if self.render_mode == "rgb_array":
-            return self._render_frame()
-        return None
+            self.task.render_frame()
+            return self.task.get_frame()
 
-    def _render_frame(self):
-        """
-        Render the current state as a frame
-        """
-        self.task.run_frame()
-
-        if self.render_mode == "rgb_array":
-            # Return current state as a RGB pixel grid
-            return np.transpose(
-                np.array(pygame.surfarray.pixels3d(canvas)), axes=(1, 0, 2)
-            )
         return None
 
     def close(self):
         self.task.quit()
+
+    def _get_obs(self):
+        """Construct observation from current state"""
+
+        # Observations are the pixel values of the current frame
+        return self.task.get_frame()
