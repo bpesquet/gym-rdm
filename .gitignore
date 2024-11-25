@@ -4,6 +4,9 @@
 # VS Code settings
 .vscode/
 
+# Output files
+_output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
