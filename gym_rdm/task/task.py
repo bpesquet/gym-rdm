@@ -6,12 +6,18 @@ import numpy as np
 import pygame
 from gym_rdm import params
 from .dot import Dot
+from gym_rdm import params
 
 
 class Task:
     """Random Dot Motion task"""
 
-    def __init__(self, show_window: bool = True, fps: int = 30):
+    def __init__(
+        self,
+        show_window: bool = True,
+        fps: int = 30,
+        coherence: float = params.COHERENCE,
+    ):
         self.show_window = show_window
         self.fps = fps
 
@@ -33,9 +39,9 @@ class Task:
 
             pygame.display.set_caption(params.WINDOW_TITLE)
 
-        self._init_dots(display_size=display_size)
+        self._init_dots(display_size=display_size, coherence=coherence)
 
-    def _init_dots(self, display_size: int):
+    def _init_dots(self, display_size: int, coherence: float):
         """Setup the moving dots"""
 
         # Center of the circular area containing the dots
@@ -56,8 +62,11 @@ class Task:
                     center=center,
                     aperture_radius=aperture_radius,
                     motion_angle=params.MOTION_ANGLE,
+                    coherence=coherence,
                 )
             )
+
+        self._draw_dots()
 
     def run(self, n_frames: int = None):
         """Run the task for a specified number of frames or indefinitely"""
@@ -85,14 +94,10 @@ class Task:
         # Move all dots
         self.dots.update()
 
+        self._draw_dots()
+
     def render_frame(self):
         """Render the current frame to the screen"""
-
-        # fill the canvas with a color to wipe away anything from last frame
-        self.canvas.fill(params.BACKGROUND_COLOR)
-
-        # Draw dots to the screen
-        self.dots.draw(self.canvas)
 
         if self.show_window:
             # Copy the updated canvas to the visible window
@@ -120,3 +125,12 @@ class Task:
 
         # Pygame cleanup
         pygame.quit()
+
+    def _draw_dots(self):
+        """Draw the dots on the screen"""
+
+        # fill the canvas with a color to wipe away anything from last frame
+        self.canvas.fill(params.BACKGROUND_COLOR)
+
+        # Draw dots to the screen
+        self.dots.draw(self.canvas)

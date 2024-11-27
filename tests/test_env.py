@@ -22,19 +22,19 @@ def test_env():
     """Test the RDM environment"""
 
     env = RandomDotMotionEnv()
-    observation, info = env.reset()
-    assert observation.shape == EXPECTED_SHAPE
+    obs, info = env.reset()
+    assert obs.shape == EXPECTED_SHAPE
     assert info is None
 
-    observation, reward, terminated, truncated, info = env.step(Action.WAIT)
-    assert observation.shape == EXPECTED_SHAPE
+    obs, reward, terminated, truncated, info = env.step(Action.WAIT)
+    assert obs.shape == EXPECTED_SHAPE
     assert reward == 0  # Temporary
     assert terminated is False
     assert truncated is False
     assert info is None
 
-    observation, reward, terminated, truncated, info = env.step(Action.DECISION_LEFT)
-    assert observation.shape == EXPECTED_SHAPE
+    obs, reward, terminated, truncated, info = env.step(Action.DECISION_LEFT)
+    assert obs.shape == EXPECTED_SHAPE
     assert reward == 0  # Temporary
     assert terminated is True
     assert truncated is False
@@ -44,7 +44,7 @@ def test_env():
 def test_env_render_human():
     """Test environment rendering for humans"""
 
-    env = RandomDotMotionEnv(render_mode="human")
+    env = RandomDotMotionEnv(render_mode="human", coherence=1)
     env.reset()
     for _ in range(60):
         env.step(env.action_space.sample())
