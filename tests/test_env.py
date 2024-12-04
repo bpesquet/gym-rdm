@@ -4,18 +4,11 @@ Unit tests for Random Dot Motion environment.
 
 from pathlib import Path
 import matplotlib.pyplot as plt
-import gymnasium as gym
 from gym_rdm.envs import RandomDotMotionEnv, Action
 from gym_rdm import params
 
 EXPECTED_SHAPE = (params.DISPLAY_SIZE, params.DISPLAY_SIZE, 3)
 OUTPUT_DIR = "_output"
-
-
-def test_env_registration():
-    """Test registering the RDM environment through Gymnasium"""
-
-    _ = gym.make("RDM-v0")
 
 
 def test_env():

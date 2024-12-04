@@ -76,7 +76,6 @@ class RandomDotMotionEnv(gym.Env, ABC):
     def step(
         self, action: Action
     ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
-
         self.task.run_frame()
 
         terminated = action != Action.WAIT
