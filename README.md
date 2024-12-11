@@ -6,7 +6,7 @@ A [Gymnasium](https://gymnasium.farama.org/) environment for training agents on 
 
 ## About
 
-This project uses [pygame](https://www.pygame.org) to animate a set of dots in a more or less random fashion, implementing the Random Dot Kinematogram (RDK) psychophysics task. The dot animation algorithm is inspired by [this repository](https://github.com/TimoFlesch/pygame_rdk).
+This project uses [pygame](https://www.pygame.org) to animate a set of dots in a more or less random fashion, implementing the Random Dot Kinematogram (RDK) psychophysics task. The animation algorithm is inspired by [this repository](https://github.com/TimoFlesch/pygame_rdk).
 
 The dot motion code is wrapped into a [Gymnasium](https://gymnasium.farama.org/) environment. Autonomous agents can be trained to recognize the main dot motion pattern through Reinforcement Learning.
 
