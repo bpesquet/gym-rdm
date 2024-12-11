@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "gym-rdm"
 version = "0.1.0"
-description = "A Gymnasium environment for training agents on Random Dot Motion tasks"
+description = "A Gymnasium environment for training agents on Random Dot Motion (RDM) tasks"
 authors = ["Baptiste Pesquet <bpesquet@gmail.com>"]
 license = "MIT"
 readme = "README.md"
