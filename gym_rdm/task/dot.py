@@ -5,6 +5,7 @@ Moving dot.
 from typing import Tuple
 import random
 import pygame
+from pygame import Rect
 from pygame.math import Vector2
 from gym_rdm import params
 
@@ -14,17 +15,17 @@ class Dot(pygame.sprite.Sprite):
 
     def __init__(
         self,
-        radius: float,
-        center: Tuple[float],
-        aperture_radius: float,
+        initial_radius: float,
+        center_position: Tuple[float, float],
+        max_radius: float,
         motion_angle: float,
         coherence: float = params.COHERENCE,
-        speed: float = params.DOT_SPEED,
+        velocity: float = params.DOT_SPEED,
     ):
         super().__init__()
 
-        self.center = center
-        self.max_radius = aperture_radius - params.DOT_SIZE / 2
+        self.center_position = center_position
+        self.max_radius = max_radius - params.DOT_SIZE / 2
 
         # Motion angle may be set randomly depending on coherence
         self.motion_angle = (
@@ -36,20 +37,24 @@ class Dot(pygame.sprite.Sprite):
         self.image.fill(color=params.DOT_COLOR)
 
         # Speed vector
-        self.speed: Vector2 = Vector2.from_polar((speed, self.motion_angle))
+        speed: Vector2 | None = Vector2.from_polar((velocity, self.motion_angle))
+        self.speed: Vector2 = speed if speed is not None else Vector2()
 
         # Initial dot angle is set randomly
-        angle = random.randint(0, 359)
+        position_angle = random.randint(0, 359)
 
         # Initial dot position in local coordinates (relative to the center of the dot circular area)
-        position = Vector2.from_polar((radius, angle))
+        initial_position: Vector2 | None = Vector2.from_polar(
+            (initial_radius, position_angle)
+        )
+        assert initial_position is not None
 
         # Fetch the rectangle object that has the dimensions of the dot, centered at its absolute coordinates
-        self.rect = self.image.get_rect(
-            center=self._get_abs_position(position=position)
+        self.rect: Rect = self.image.get_rect(
+            center=self._get_abs_position(position=initial_position)
         )
 
-    def update(self):
+    def update(self) -> None:
         """(Overriden) Move the dot around"""
 
         # Move dot according to speed vector
@@ -57,11 +62,11 @@ class Dot(pygame.sprite.Sprite):
 
         # Check if dot is now outside of circular area, and reset its position in that case
         new_position = Vector2(self.rect.center)
-        distance_to_center = new_position.distance_to(Vector2(self.center))
+        distance_to_center = new_position.distance_to(Vector2(self.center_position))
         if distance_to_center > self.max_radius:
             self._reset()
 
-    def _reset(self):
+    def _reset(self) -> None:
         """Reset dot position"""
 
         # Move dot to the other side of the circular area
@@ -72,16 +77,20 @@ class Dot(pygame.sprite.Sprite):
         # Compute local coordinates
         new_position = Vector2.from_polar((new_radius, new_angle))
 
-        # Update position of the dot
-        self.rect = self.image.get_rect(
-            center=self._get_abs_position(position=new_position)
-        )
+        if new_position is not None:
+            # Update position of the dot
+            self.rect = self.image.get_rect(
+                center=self._get_abs_position(position=new_position)
+            )
 
-    def _get_abs_position(self, position: Vector2):
+    def _get_abs_position(self, position: Vector2) -> Tuple[float, float]:
         """Convert local coordinates to absolute"""
 
         # Pygame origin is the top left of the screen
-        return (position.x + self.center[0], self.center[1] - position.y)
+        return (
+            position.x + self.center_position[0],
+            self.center_position[1] - position.y,
+        )
 
-    def __str__(self):
-        return f"Position: {self.rect}"
+    def __str__(self) -> str:
+        return f"Position: {self.rect}. Speed: {self.speed}. Motion angle: {self.motion_angle}"

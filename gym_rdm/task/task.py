@@ -3,10 +3,14 @@ Random Dot Motion task.
 """
 
 import numpy as np
+from numpy.typing import NDArray
 import pygame
+from pygame.sprite import Group
 from gym_rdm import params
 from .dot import Dot
-from gym_rdm import params
+
+# Frame type: a NumPy array containing pisel values as 8-bits RGB triplets
+FrameType = NDArray[np.uint8]
 
 
 class Task:
@@ -41,7 +45,7 @@ class Task:
 
         self._init_dots(display_size=display_size, coherence=coherence)
 
-    def _init_dots(self, display_size: int, coherence: float):
+    def _init_dots(self, display_size: int, coherence: float) -> None:
         """Setup the moving dots"""
 
         # Center of the circular area containing the dots
@@ -54,13 +58,13 @@ class Task:
         weights = np.arange(aperture_radius) / sum(np.arange(aperture_radius))
         radii = np.random.choice(a=aperture_radius, size=n_dots, p=weights)
 
-        self.dots = pygame.sprite.Group()
+        self.dots: Group[Dot] = Group()
         for i in range(n_dots):
             self.dots.add(
                 Dot(
-                    radius=radii[i],
-                    center=center,
-                    aperture_radius=aperture_radius,
+                    initial_radius=radii[i],
+                    center_position=center,
+                    max_radius=aperture_radius,
                     motion_angle=params.MOTION_ANGLE,
                     coherence=coherence,
                 )
@@ -68,7 +72,7 @@ class Task:
 
         self._draw_dots()
 
-    def run(self, n_frames: int = None):
+    def run(self, n_frames: int | None = None) -> None:
         """Run the task for a specified number of frames or indefinitely"""
 
         frame = 0
@@ -88,7 +92,7 @@ class Task:
 
         self.quit()
 
-    def run_frame(self):
+    def run_frame(self) -> None:
         """Run the task for one frame"""
 
         # Move all dots
@@ -96,7 +100,7 @@ class Task:
 
         self._draw_dots()
 
-    def render_frame(self):
+    def render_frame(self) -> None:
         """Render the current frame to the screen"""
 
         if self.show_window:
@@ -113,20 +117,20 @@ class Task:
             # The following line will automatically add a delay to keep the framerate stable.
             self.clock.tick(self.fps)
 
-    def get_frame(self) -> np.ndarray:
+    def get_frame(self) -> FrameType:
         """Return the current frame as an array of pixels"""
 
         return np.transpose(
             np.array(pygame.surfarray.pixels3d(self.canvas)), axes=(1, 0, 2)
         )
 
-    def quit(self):
+    def quit(self) -> None:
         """Quit the task"""
 
         # Pygame cleanup
         pygame.quit()
 
-    def _draw_dots(self):
+    def _draw_dots(self) -> None:
         """Draw the dots on the screen"""
 
         # fill the canvas with a color to wipe away anything from last frame

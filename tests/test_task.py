@@ -6,7 +6,7 @@ from gym_rdm.task import Task
 from gym_rdm import params
 
 
-def test_task(infinite: bool = False):
+def test_task(infinite: bool = False) -> None:
     """Test the Task class"""
 
     n_frames = None if infinite else 60
@@ -14,7 +14,7 @@ def test_task(infinite: bool = False):
     task.run(n_frames=n_frames)
 
 
-def test_task_without_window():
+def test_task_without_window() -> None:
     """Test the Task task without showing the window"""
 
     task = Task(show_window=False)

@@ -9,7 +9,7 @@ import gymnasium as gym
 import gym_rdm
 
 
-def test_env_registration():
+def test_env_registration() -> None:
     """Test registering the RDM environment through Gymnasium"""
 
     _ = gym.make("RDM-v0")

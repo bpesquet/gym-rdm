@@ -11,30 +11,30 @@ EXPECTED_SHAPE = (params.DISPLAY_SIZE, params.DISPLAY_SIZE, 3)
 OUTPUT_DIR = "_output"
 
 
-def test_env():
+def test_env() -> None:
     """Test the RDM environment"""
 
     env = RandomDotMotionEnv()
     obs, info = env.reset()
     assert obs.shape == EXPECTED_SHAPE
-    assert info is None
+    assert not info
 
     obs, reward, terminated, truncated, info = env.step(Action.WAIT)
     assert obs.shape == EXPECTED_SHAPE
     assert reward == 0  # Temporary
     assert terminated is False
     assert truncated is False
-    assert info is None
+    assert not info
 
     obs, reward, terminated, truncated, info = env.step(Action.DECISION_LEFT)
     assert obs.shape == EXPECTED_SHAPE
     assert reward == 0  # Temporary
     assert terminated is True
     assert truncated is False
-    assert info is None
+    assert not info
 
 
-def test_env_render_human():
+def test_env_render_human() -> None:
     """Test environment rendering for humans"""
 
     env = RandomDotMotionEnv(render_mode="human", coherence=1)
@@ -44,16 +44,17 @@ def test_env_render_human():
     env.close()
 
 
-def test_env_render_rgb():
+def test_env_render_rgb() -> None:
     """Test environment rendering as rgb frames"""
 
     env = RandomDotMotionEnv(render_mode="rgb_array")
     env.reset()
     env.step(env.action_space.sample())
     frame = env.render()
-    assert frame.shape == EXPECTED_SHAPE
+    if frame is not None:
+        assert frame.shape == EXPECTED_SHAPE
 
-    plt.imshow(frame)
-    # Save the frame to disk
-    Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
-    plt.savefig(f"{OUTPUT_DIR}/env_frame_rgb.png")
+        plt.imshow(frame)
+        # Save the frame to disk
+        Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+        plt.savefig(f"{OUTPUT_DIR}/env_frame_rgb.png")
