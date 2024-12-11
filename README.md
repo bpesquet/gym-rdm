@@ -27,6 +27,7 @@ This project is built and tested with the following software:
 - [Black](https://github.com/psf/black) for code formatting;
 - [Pylint](https://github.com/pylint-dev/pylint) and [mypy](http://mypy-lang.org/) to detect defaults and mistakes in the code;
 - [pytest](https://docs.pytest.org) for testing the code.
+- A [GitHub Action](.github/workflows/ci.yaml) to check and test the code upon each push.
 
 ### Useful commands
 
