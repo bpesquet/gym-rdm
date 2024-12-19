@@ -6,19 +6,10 @@ from abc import ABC
 from enum import Enum
 from typing import Any
 import numpy as np
-from numpy.typing import NDArray
 import gymnasium as gym
-from gym_rdm.task import Task, FrameType
+from gym_rdm.task import Task
 from gym_rdm.config import Config
-
-# Observation type: a NumPy array containing pisel values as 8-bits RGB triplets
-ObsType = NDArray[np.uint8]
-
-# Information type: a plain Python dictionary
-InfoType = dict[str, Any]
-
-# Action type: integer values corresponding to possible actions
-ActionType = np.int64
+from gym_rdm.typing import GymFrame, GymObs, GymInfo, GymAction
 
 
 class Action(Enum):
@@ -34,7 +25,7 @@ class Action(Enum):
     DECISION_RIGHT = 2
 
 
-class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
+class RandomDotMotionEnv(gym.Env[GymObs, GymAction], ABC):
     """Gym environment implementing a RDM task"""
 
     # Supported render modes and framerate
@@ -67,7 +58,7 @@ class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
 
     def reset(
         self, *, seed: int | None = None, options: dict[str, Any] | None = None
-    ) -> tuple[ObsType, InfoType]:
+    ) -> tuple[GymObs, GymInfo]:
         # initialize the random number generator
         super().reset(seed=seed)
 
@@ -79,8 +70,8 @@ class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
         return observation, {}
 
     def step(
-        self, action: ActionType | Action
-    ) -> tuple[ObsType, float, bool, bool, InfoType]:
+        self, action: GymAction | Action
+    ) -> tuple[GymObs, float, bool, bool, GymInfo]:
         self.task.run_frame()
 
         terminated = action != Action.WAIT
@@ -95,7 +86,7 @@ class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
     # Ignoring incompatible return type error from mypy
     # https://github.com/Farama-Foundation/Gymnasium/issues/845
     # https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
-    def render(self) -> FrameType | None:  # type: ignore[override]
+    def render(self) -> GymFrame | None:  # type: ignore[override]
         if self.render_mode == "rgb_array":
             self.task.render_frame()
             return self.task.get_frame()
@@ -105,7 +96,7 @@ class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
     def close(self) -> None:
         self.task.quit()
 
-    def _get_obs(self) -> ObsType:
+    def _get_obs(self) -> GymObs:
         """Construct observation from current state"""
 
         # Observations are the pixel values of the current frame

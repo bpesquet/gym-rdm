@@ -3,14 +3,11 @@ Random Dot Motion task.
 """
 
 import numpy as np
-from numpy.typing import NDArray
 import pygame
 from pygame.sprite import Group
 from gym_rdm.config import Config
+from gym_rdm.typing import GymFrame
 from .dot import Dot
-
-# Frame type: a NumPy array containing pisel values as 8-bits RGB triplets
-FrameType = NDArray[np.uint8]
 
 
 class Task:
@@ -116,7 +113,7 @@ class Task:
             # The following line will automatically add a delay to keep the framerate stable.
             self.clock.tick(self.fps)
 
-    def get_frame(self) -> FrameType:
+    def get_frame(self) -> GymFrame:
         """Return the current frame as an array of pixels"""
 
         return np.transpose(
