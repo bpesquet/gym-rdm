@@ -21,6 +21,7 @@ class Task:
         show_window: bool = True,
         fps: int = 30,
         coherence: float = params.COHERENCE,
+        motion_angle: float = params.MOTION_ANGLE,
     ):
         self.show_window = show_window
         self.fps = fps
@@ -43,9 +44,13 @@ class Task:
 
             pygame.display.set_caption(params.WINDOW_TITLE)
 
-        self._init_dots(display_size=display_size, coherence=coherence)
+        self._init_dots(
+            display_size=display_size, coherence=coherence, motion_angle=motion_angle
+        )
 
-    def _init_dots(self, display_size: int, coherence: float) -> None:
+    def _init_dots(
+        self, display_size: int, coherence: float, motion_angle: float
+    ) -> None:
         """Setup the moving dots"""
 
         # Center of the circular area containing the dots
@@ -65,7 +70,7 @@ class Task:
                     initial_radius=radii[i],
                     center_position=center,
                     max_radius=aperture_radius,
-                    motion_angle=params.MOTION_ANGLE,
+                    motion_angle=motion_angle,
                     coherence=coherence,
                 )
             )

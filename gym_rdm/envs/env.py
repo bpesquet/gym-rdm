@@ -44,6 +44,7 @@ class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
         self,
         render_mode: str | None = None,
         coherence: float = params.COHERENCE,
+        motion_angle: float = params.MOTION_ANGLE,
     ):
         """
         Initialize the environment
@@ -56,6 +57,7 @@ class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
             show_window=self.render_mode == "human",
             fps=self.metadata["render_fps"],
             coherence=coherence,
+            motion_angle=motion_angle,
         )
 
         self.action_space = gym.spaces.Discrete(len(Action))
