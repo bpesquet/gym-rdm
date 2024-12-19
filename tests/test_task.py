@@ -3,7 +3,6 @@ Unit tests for Random Dot Motion task.
 """
 
 from gym_rdm.task import Task
-from gym_rdm import params
 
 
 def test_task(infinite: bool = False) -> None:
@@ -21,7 +20,7 @@ def test_task_without_window() -> None:
     task.run_frame()
     task.render_frame()
     frame = task.get_frame()
-    assert frame.shape == (params.DISPLAY_SIZE, params.DISPLAY_SIZE, 3)
+    assert frame.shape == (task.config.display_size, task.config.display_size, 3)
 
 
 # Standalone execution with no duration specified

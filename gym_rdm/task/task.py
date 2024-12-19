@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 import pygame
 from pygame.sprite import Group
-from gym_rdm import params
+from gym_rdm.config import Config
 from .dot import Dot
 
 # Frame type: a NumPy array containing pisel values as 8-bits RGB triplets
@@ -20,11 +20,11 @@ class Task:
         self,
         show_window: bool = True,
         fps: int = 30,
-        coherence: float = params.COHERENCE,
-        motion_angle: float = params.MOTION_ANGLE,
+        config: Config = Config(),
     ):
         self.show_window = show_window
         self.fps = fps
+        self.config = config
 
         # Pygame setup
         pygame.init()
@@ -32,46 +32,40 @@ class Task:
         # Clock used to ensure that the environment is rendered at the correct framerate
         self.clock = pygame.time.Clock()
 
-        # Size of the display surface and window
-        display_size = params.DISPLAY_SIZE
-
         # Define the surface we draw dots upon
-        self.canvas = pygame.Surface((display_size, display_size))
+        self.canvas = pygame.Surface((config.display_size, config.display_size))
 
         if self.show_window:
             # Define the window shown to the user
-            self.window = pygame.display.set_mode((display_size, display_size))
+            self.window = pygame.display.set_mode(
+                (config.display_size, config.display_size)
+            )
 
-            pygame.display.set_caption(params.WINDOW_TITLE)
+            pygame.display.set_caption(config.window_title)
 
-        self._init_dots(
-            display_size=display_size, coherence=coherence, motion_angle=motion_angle
-        )
+        self._init_dots()
 
-    def _init_dots(
-        self, display_size: int, coherence: float, motion_angle: float
-    ) -> None:
+    def _init_dots(self) -> None:
         """Setup the moving dots"""
 
         # Center of the circular area containing the dots
-        center = (display_size / 2, display_size / 2)
-        n_dots = params.N_DOTS
-
-        aperture_radius = params.APERTURE_RADIUS
+        center = (self.config.display_size / 2, self.config.display_size / 2)
 
         # Use weighted sampling distribution to avoid dots clustering close to center
-        weights = np.arange(aperture_radius) / sum(np.arange(aperture_radius))
-        radii = np.random.choice(a=aperture_radius, size=n_dots, p=weights)
+        weights = np.arange(self.config.dot_area_radius) / sum(
+            np.arange(self.config.dot_area_radius)
+        )
+        radii = np.random.choice(
+            a=self.config.dot_area_radius, size=self.config.n_dots, p=weights
+        )
 
         self.dots: Group[Dot] = Group()
-        for i in range(n_dots):
+        for i in range(self.config.n_dots):
             self.dots.add(
                 Dot(
                     initial_radius=radii[i],
                     center_position=center,
-                    max_radius=aperture_radius,
-                    motion_angle=motion_angle,
-                    coherence=coherence,
+                    config=self.config,
                 )
             )
 
@@ -139,7 +133,7 @@ class Task:
         """Draw the dots on the screen"""
 
         # fill the canvas with a color to wipe away anything from last frame
-        self.canvas.fill(params.BACKGROUND_COLOR)
+        self.canvas.fill(self.config.background_color)
 
         # Draw dots to the screen
         self.dots.draw(self.canvas)

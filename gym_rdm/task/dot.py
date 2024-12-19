@@ -7,7 +7,7 @@ import random
 import pygame
 from pygame import Rect
 from pygame.math import Vector2
-from gym_rdm import params
+from gym_rdm.config import Config
 
 
 class Dot(pygame.sprite.Sprite):
@@ -17,27 +17,28 @@ class Dot(pygame.sprite.Sprite):
         self,
         initial_radius: float,
         center_position: Tuple[float, float],
-        max_radius: float,
-        motion_angle: float,
-        coherence: float = params.COHERENCE,
-        velocity: float = params.DOT_SPEED,
+        config: Config = Config(),
     ):
         super().__init__()
 
         self.center_position = center_position
-        self.max_radius = max_radius - params.DOT_SIZE / 2
+        self.max_radius = config.dot_area_radius - config.dot_size / 2
 
         # Motion angle may be set randomly depending on coherence
         self.motion_angle = (
-            motion_angle if random.random() < coherence else random.randint(0, 359)
+            config.motion_angle
+            if random.random() < config.motion_coherence
+            else random.randint(0, 359)
         )
 
         # Create an image of the dot, and fill it with its color
-        self.image = pygame.Surface(size=[params.DOT_SIZE, params.DOT_SIZE])
-        self.image.fill(color=params.DOT_COLOR)
+        self.image = pygame.Surface(size=[config.dot_size, config.dot_size])
+        self.image.fill(color=config.dot_color)
 
         # Speed vector
-        speed: Vector2 | None = Vector2.from_polar((velocity, self.motion_angle))
+        speed: Vector2 | None = Vector2.from_polar(
+            (config.dot_velocity, self.motion_angle)
+        )
         self.speed: Vector2 = speed if speed is not None else Vector2()
 
         # Initial dot angle is set randomly

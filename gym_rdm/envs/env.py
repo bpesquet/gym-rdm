@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 import gymnasium as gym
 from gym_rdm.task import Task, FrameType
-from gym_rdm import params
+from gym_rdm.config import Config
 
 # Observation type: a NumPy array containing pisel values as 8-bits RGB triplets
 ObsType = NDArray[np.uint8]
@@ -43,8 +43,7 @@ class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
     def __init__(
         self,
         render_mode: str | None = None,
-        coherence: float = params.COHERENCE,
-        motion_angle: float = params.MOTION_ANGLE,
+        config: Config = Config(),
     ):
         """
         Initialize the environment
@@ -56,8 +55,7 @@ class RandomDotMotionEnv(gym.Env[ObsType, ActionType], ABC):
         self.task = Task(
             show_window=self.render_mode == "human",
             fps=self.metadata["render_fps"],
-            coherence=coherence,
-            motion_angle=motion_angle,
+            config=config,
         )
 
         self.action_space = gym.spaces.Discrete(len(Action))
