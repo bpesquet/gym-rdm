@@ -4,7 +4,7 @@ Unit tests for Random Dot Motion environment.
 
 from pathlib import Path
 import matplotlib.pyplot as plt
-from gym_rdm.envs import RandomDotMotionEnv, Action
+from gym_rdm.envs import RandomDotMotionEnv, Action, RenderMode
 from gym_rdm.config import Config
 
 config = Config()
@@ -38,7 +38,9 @@ def test_env() -> None:
 def test_env_render_human() -> None:
     """Test environment rendering for humans"""
 
-    env = RandomDotMotionEnv(render_mode="human", config=Config(motion_coherence=0))
+    env = RandomDotMotionEnv(
+        render_mode=RenderMode.HUMAN, config=Config(motion_coherence=0)
+    )
     env.reset()
     for _ in range(60):
         env.step(env.action_space.sample())

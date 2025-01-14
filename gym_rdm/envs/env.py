@@ -3,7 +3,7 @@ Random Dot Motion environment for Gymnasium.
 """
 
 from abc import ABC
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any
 import numpy as np
 import gymnasium as gym
@@ -14,7 +14,7 @@ from gym_rdm.typing import GymFrame, GymObs, GymInfo, GymAction
 
 class Action(Enum):
     """
-    Action space constants
+    Possible actions for the agent
     """
 
     # Wait for more information before committing to a decision
@@ -25,26 +25,39 @@ class Action(Enum):
     DECISION_RIGHT = 2
 
 
+class RenderMode(StrEnum):
+    """
+    Possible render modes for the environment
+    """
+
+    HUMAN = "human"
+    RGB_ARRAY = "rgb_array"
+    NONE = "None"
+
+
 class RandomDotMotionEnv(gym.Env[GymObs, GymAction], ABC):
     """Gym environment implementing a RDM task"""
 
     # Supported render modes and framerate
-    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 30}
+    metadata = {
+        "render_modes": [RenderMode.HUMAN, RenderMode.RGB_ARRAY, RenderMode.NONE],
+        "render_fps": 30,
+    }
 
     def __init__(
         self,
-        render_mode: str | None = None,
+        render_mode: RenderMode = RenderMode.NONE,
         config: Config = Config(),
     ):
         """
         Initialize the environment
         """
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        assert render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
 
         # Init the RDM task
         self.task = Task(
-            show_window=self.render_mode == "human",
+            show_window=self.render_mode == RenderMode.HUMAN,
             fps=self.metadata["render_fps"],
             config=config,
         )
@@ -64,7 +77,7 @@ class RandomDotMotionEnv(gym.Env[GymObs, GymAction], ABC):
 
         observation = self._get_obs()
 
-        if self.render_mode == "human":
+        if self.render_mode == RenderMode.HUMAN:
             self.task.render_frame()
 
         return observation, {}
@@ -78,7 +91,7 @@ class RandomDotMotionEnv(gym.Env[GymObs, GymAction], ABC):
         reward = 0  # No learning for now
         observation = self._get_obs()
 
-        if self.render_mode == "human":
+        if self.render_mode == RenderMode.HUMAN:
             self.task.render_frame()
 
         return observation, reward, terminated, False, {}
@@ -87,7 +100,7 @@ class RandomDotMotionEnv(gym.Env[GymObs, GymAction], ABC):
     # https://github.com/Farama-Foundation/Gymnasium/issues/845
     # https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
     def render(self) -> GymFrame | None:  # type: ignore[override]
-        if self.render_mode == "rgb_array":
+        if self.render_mode == RenderMode.RGB_ARRAY:
             self.task.render_frame()
             return self.task.get_frame()
 
