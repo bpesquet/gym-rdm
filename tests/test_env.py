@@ -50,7 +50,7 @@ def test_env_render_human() -> None:
 def test_env_render_rgb() -> None:
     """Test environment rendering as rgb frames"""
 
-    env = RandomDotMotionEnv(render_mode="rgb_array")
+    env = RandomDotMotionEnv(render_mode=RenderMode.RGB_ARRAY)
     env.reset()
     env.step(env.action_space.sample())
     frame = env.render()
