@@ -33,22 +33,22 @@ This project is built and tested with the following software:
 
 ```bash
 # Reformat all Python files
-black gym_rdm tests
+black .
 
 # Check the code for mistakes
-pylint gym_rdm tests
+pylint gym_rdm/* tests/*
+
+# Run static type checking.
+# The -strict flag is... stricter. It should pass on the codebase
+mypy [--strict] .
 
 # Run all code examples as unit tests
 # The -s flag prints code output
 pytest [-s]
-
-# Run static type checking
-# The -strict flag is... stricter. It should pass on the codebase
-mypy [--strict] .
 ```
 
 ## License
 
-[MIT](CODE_LICENSE).
+[MIT](LICENSE).
 
 Copyright © 2024-present [Baptiste Pesquet](https://bpesquet.fr).
