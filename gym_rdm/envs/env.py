@@ -38,27 +38,21 @@ class RenderMode(StrEnum):
 class RandomDotMotionEnv(gym.Env[GymObs, GymAction], ABC):
     """Gym environment implementing a RDM task"""
 
-    # Supported render modes and framerate
-    metadata = {
-        "render_modes": [RenderMode.HUMAN, RenderMode.RGB_ARRAY, RenderMode.NONE],
-        "render_fps": 30,
-    }
-
     def __init__(
         self,
         render_mode: RenderMode = RenderMode.NONE,
+        fps: int = 30,
         config: Config = Config(),
     ):
         """
         Initialize the environment
         """
-        assert render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
 
         # Init the RDM task
         self.task = Task(
             show_window=self.render_mode == RenderMode.HUMAN,
-            fps=self.metadata["render_fps"],
+            fps=fps,
             config=config,
         )
 
